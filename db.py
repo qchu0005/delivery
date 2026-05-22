@@ -15,8 +15,8 @@ def _connect():
 def get_all_locations():
     with _connect() as conn:
         rows = conn.execute("""
-            SELECT l.id, l.name, l.type
-            FROM locations l
+            SELECT id, name, type
+            FROM locations 
         """).fetchall()
     return [dict(row) for row in rows]
 
