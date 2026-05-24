@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from db import (
     get_all_locations, get_location,
-    get_depot, create_delivery, get_delivery, update_delivery_arrived
+    get_depot, create_delivery, get_delivery, update_delivery_arrived,
+    get_deliveries_summary
 )
 from graph import build_graph, dijkstra, reachable_from
 
@@ -134,6 +135,12 @@ def unreachable_locations():
         if loc["type"] == "customer" and loc["id"] not in reachable
     ]
     return jsonify(result)
+
+# GET /deliveries/summary (Task 6)
+
+@app.route("/deliveries/summary", methods=["GET"])
+def delivery_summary():
+    return jsonify(get_deliveries_summary())
 
 
 

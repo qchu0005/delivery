@@ -94,4 +94,18 @@ def update_delivery_arrived(delivery_id):
     return dict(row)
 
 
-
+def get_deliveries_summary():
+    with _connect() as conn:
+        rows = conn.execute("""
+            SELECT
+                l.id          AS customer_id,
+                l.name        AS customer_name,
+                COUNT(d.id)   AS total_deliveries,
+                MAX(d.departed_at) AS last_delivery_date
+            FROM locations l
+            LEFT JOIN deliveries d ON d.customer_id = l.id
+            WHERE l.type = 'customer'
+            GROUP BY l.id, l.name
+            ORDER BY l.id
+        """).fetchall()
+    return [dict(row) for row in rows]
