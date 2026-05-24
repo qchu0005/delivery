@@ -67,3 +67,16 @@ def dijkstra(graph, start, end):
     return path, round(dist[end], 2)
 
 
+def reachable_from(graph, start):
+    """Return the set of all node IDs reachable from start (inclusive)."""
+    visited = set()
+    stack = [start]
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        for neighbor, _ in graph.get(node, []):
+            if neighbor not in visited:
+                stack.append(neighbor)
+    return visited

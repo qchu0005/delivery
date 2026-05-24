@@ -3,7 +3,7 @@ from db import (
     get_all_locations, get_location,
     get_depot, create_delivery, get_delivery, update_delivery_arrived
 )
-from graph import build_graph, dijkstra
+from graph import build_graph, dijkstra, reachable_from
 
 app = Flask(__name__)
 
@@ -94,8 +94,7 @@ def post_delivery():
     delivery = create_delivery(customer_id, truck_plate.strip())
     return jsonify(delivery), 201
 
-
-# PATCH /deliveries/<id>/status 
+# PATCH /deliveries/<id>/status
 
 @app.route("/deliveries/<int:delivery_id>/status", methods=["PATCH"])
 def patch_delivery_status(delivery_id):
@@ -121,4 +120,22 @@ def patch_delivery_status(delivery_id):
     updated = update_delivery_arrived(delivery_id)
     return jsonify(updated)
 
+# GET /locations/unreachable (Task 5) 
 
+@app.route("/locations/unreachable", methods=["GET"])
+def unreachable_locations():
+    depot = get_depot()
+    graph = build_graph()
+    reachable = reachable_from(graph, depot["id"])
+
+    result = [
+        {"id": loc["id"], "name": loc["name"], "type": loc["type"]}
+        for loc in get_all_locations()
+        if loc["type"] == "customer" and loc["id"] not in reachable
+    ]
+    return jsonify(result)
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
