@@ -1,8 +1,8 @@
 ## Setup & Running
 
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+# 1. Install Flask
+pip install Flask
 
 # 2. Start the server (default port 5000)
 python app.py
@@ -14,8 +14,7 @@ The server runs at `http://localhost:5000`.
 
 **Python 3** with **Flask**.
 
-Python chosen as it has built in standard library (sqlite3) and has cleaner syntax compared to JS (easier for DSA). Flask was chosen for its minimal footprint — no ORM, no config files, no boilerplate, it provides clean routing and JSON responses.
-
+Python chosen as it has built in standard library (sqlite3) and has cleaner syntax compared to JS (easier for DSA). Flask was chosen as it provides clean routing and JSON responses.
 
 ## How the Algorithm Works
 
@@ -36,19 +35,18 @@ If the target is never reached (distance stays ∞), the two locations are in di
 
 **Reachability check** (Task 5) uses a simple depth-first search from the depot. Any customer node not visited by the DFS is unreachable, even if it has roads that only connect to other isolated nodes.
 
-
-
-
 ## API Endpoints
 
 ### GET /locations
+
 Returns all locations with type and direct road connection count.
 
 ```bash
 curl http://localhost:5000/locations
 ```
 
-### GET /locations/unreachable *(Task 5)*
+### GET /locations/unreachable _(Task 5)_
+
 Returns customer locations that have no road path to the depot (determined via graph traversal, not just SQL).
 
 ```bash
@@ -56,6 +54,7 @@ curl http://localhost:5000/locations/unreachable
 ```
 
 ### GET /route?from=\<id\>&to=\<id\>
+
 Finds the shortest path by distance between two locations. Returns `reachable: false` (HTTP 200) if no path exists. Returns HTTP 404 if either location ID is unknown, HTTP 400 if parameters are missing or non-integer.
 
 ```bash
@@ -67,6 +66,7 @@ curl "http://localhost:5000/route?from=1&to=11"
 ```
 
 ### POST /deliveries
+
 Logs a new delivery departure. Validates that the customer exists, is a customer (not depot), and is reachable from the depot.
 
 ```bash
@@ -76,6 +76,7 @@ curl -X POST http://localhost:5000/deliveries \
 ```
 
 ### PATCH /deliveries/\<id\>/status
+
 Marks a delivery as arrived. Only the `departed → arrived` transition is valid; any other attempt returns HTTP 422.
 
 ```bash
@@ -84,7 +85,8 @@ curl -X PATCH http://localhost:5000/deliveries/7/status \
   -d '{"status": "arrived"}'
 ```
 
-### GET /deliveries/summary *(Task 6)*
+### GET /deliveries/summary _(Task 6)_
+
 Returns per-customer delivery count and most recent delivery date, computed via a single SQL aggregation query.
 
 ```bash
@@ -92,6 +94,27 @@ curl http://localhost:5000/deliveries/summary
 ```
 
 ---
+
+OR POSTMAN
+
+GET http://localhost:5000/locations  
+GET http://localhost:5000/locations/unreachable
+GET http://localhost:5000/route?from=1&to=7
+GET http://localhost:5000/route?from=1&to=11
+POST http://localhost:5000/deliveries
+PATCH http://localhost:5000/deliveries/1/status
+GET http://localhost:5000/deliveries/summary
+
+POST:
+{
+"customer_id": 7,
+"truck_plate": "WB5678C"
+}
+
+PATCH:
+{
+"status": "arrived"
+}
 
 ## Assumptions & Notes
 
